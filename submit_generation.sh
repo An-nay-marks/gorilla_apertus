@@ -2,7 +2,7 @@
 #SBATCH --account=large-sc-2
 #SBATCH --job-name=bfcl_eval_apertus
 #SBATCH --partition=normal
-#SBATCH --time=00:05:00
+#SBATCH --time=12:00:00
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=4
 #SBATCH --cpus-per-task=288
@@ -62,4 +62,4 @@ export WANDB_WATCH="false"
 cd "$BASE_PATH/gorilla_apertus/berkeley-function-call-leaderboard/"
 
 # python -m bfcl_eval._llm_response_generation --model ApertusFC --test-category simple --result-dir results_apertus --num-threads 1 --include-input-log
-bfcl generate --model ApertusFC --test-category simple_python --result-dir results_apertus --num-threads 1 --include-input-log
+bfcl generate --model ApertusFC --test-category simple_python --result-dir results_apertus --num-threads 4 --include-input-log

@@ -42,5 +42,10 @@ berkeley-function-call-leaderboard/**/*.lock
 .direnv/
 .venv
 
+**.file_locks
+core_**
+slurm-**.out
+slurm-**.err
+results_apertus
 # Ignore the wandb cache:
 **/wandb/
