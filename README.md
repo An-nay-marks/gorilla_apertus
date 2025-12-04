@@ -1,3 +1,44 @@
+# Anne's Doku:
+- create a new sqsh file: 
+cd $SCRATCH
+mkdir -p $SCRATCH/ce-images
+lfs setstripe -E 4M -c 1 -E 64M -c 4 -E -1 -c -1 -S 4M \
+  $SCRATCH/ce-images
+cd .../gorilla_apertus
+srun -A large-sc-2 --pty bash
+podman build -t bfcl:01 .
+enroot import -x mount \
+  -o $SCRATCH/ce-images/bfcl+01.sqsh \
+  podman://bfcl:01
+cd $SCRATCH
+mkdir envs
+cd envs
+vi bfcl-01.toml
+
+paste:
+image = "${SCRATCH}/ce-images/bfcl+01.sqsh"          
+
+mounts = [
+    "/capstor",
+    "/iopsstor"
+]
+
+workdir = "${SCRATCH}/apertus-finetuning-project/gorilla_apertus"
+
+[annotations]
+com.hooks.aws_ofi_nccl.enabled = "true"
+com.hooks.aws_ofi_nccl.variant = "cuda12"
+
+[env]
+NCCL_DEBUG = "INFO"
+CUDA_CACHE_DISABLE = "1"
+TORCH_NCCL_ASYNC_ERROR_HANDLING = "1"
+MPICH_GPU_SUPPORT_ENABLED = "0"
+
+
+
+
+
 # Gorilla: Large Language Model Connected with Massive APIs
 
 <div align="center">

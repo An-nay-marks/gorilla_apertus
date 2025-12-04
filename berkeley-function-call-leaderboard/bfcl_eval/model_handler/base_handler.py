@@ -693,9 +693,12 @@ class BaseHandler:
         )
 
         api_response, query_latency = self._query_FC(inference_data)
+        
+        # print("API Response:", api_response)
 
         # Try parsing the model response
         model_response_data = self._parse_query_response_FC(api_response)
+        # print("Parsed Model Response Data:", model_response_data)
 
         # Process the metadata
         metadata = {}
