@@ -206,6 +206,32 @@ class ApertusFCHandler(BaseHandler):
         latency = end_time - start_time
         return api_response, latency
 
+    @override
+    def decode_ast(self, result, language, has_tool_call_tag):
+        result = result.replace("<|python_tag|>", "")
+        # Llama sometimes separates the function calls with `;` and sometimes with `,`
+        if ";" in result:
+            """
+            "<|python_tag|>{\"name\": \"calc_binomial_probability\", \"parameters\": {\"n\": \"10\", \"k\": \"3\", \"p\": \"0\"}}; {\"name\": \"calc_binomial_probability\", \"parameters\": {\"n\": \"15\", \"k\": \"5\", \"p\": \"0\"}}; {\"name\": \"calc_binomial_probability\", \"parameters\": {\"n\": \"20\", \"k\": \"7\", \"p\": \"0\"}}"
+            """
+            function_calls = result.split(";")
+            function_calls = [json.loads(func_call) for func_call in function_calls]
+        else:
+            """
+            "[\n    {\"name\": \"calculate_permutations\", \"parameters\": {\"n\": \"20\", \"k\": \"5\"}},\n    {\"name\": \"calculate_permutations\", \"parameters\": {\"n\": \"12\", \"k\": \"5\"}},\n    {\"name\": \"calculate_permutations\", \"parameters\": {\"n\": \"10\", \"k\": \"3\"}}\n]"
+            """
+            function_calls = eval(result)
+            if type(function_calls) == dict:
+                function_calls = [function_calls]
+
+        decoded_output = []
+        for func_call in function_calls:
+            name = func_call["name"]
+            params = func_call["parameters"]
+            decoded_output.append({name: params})
+
+        return decoded_output
+    
     def _parse_query_response_FC(self, api_response: Any) -> dict:
         # The model returns text that includes tool calls and tool outputs in the Apertus template.
         # We will return the raw text as 'model_responses' and the token usage.
